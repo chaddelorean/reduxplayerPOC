@@ -1,0 +1,21 @@
+{
+  "name": "reduxpoc",
+  "version": "1.0.0",
+  "description": "POC for moving timeline into redux",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "redux": "^4.0.5",
+    "require": "^2.4.20"
+  },
+  "devDependencies": {
+    "redux-devtools-extension": "^2.13.8",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  }
+}
