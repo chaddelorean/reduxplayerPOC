@@ -1,9 +1,10 @@
-import { timeUpdate, playState, pauseState, stalledState, stoppedState, seekingState, nextClip } from './actions/index.js';
+import { timeUpdate, playState, pauseState, stalledState, stoppedState, seekingState, nextClip, updateClipList, clipEnded } from './actions/index.js';
 import { timelineStore, apjsStore } from './store/index.js';
 import { playerEnums } from './types/playerEnums.js';
 import ClipList from './types/clipList.js';
 
 const intervalTime = 100;
+const STALLED_THRESHOLD = 10000;
 let sampleVideoPlayer;
 let timelineInterval;
 
@@ -23,25 +24,39 @@ $(function() {
     sampleVideoPlayer.onseeking = () => {
         apjsStore.dispatch(seekingState());
     }
-    sampleVideoPlayer.onsuspend = () => {
-    //    apjsStore.dispatch(stoppedState());
-    }
     sampleVideoPlayer.onended = () => {
-        apjsStore.dispatch(nextClip());
-        loadVideoSrc(sampleVideoPlayer);
+        apjsStore.dispatch(clipEnded());
+        let apjsStoreState = apjsStore.getState();
+        if (apjsStoreState) {
+            let currentClipIndex = apjsStoreState.clipListReducer.currentClipIndex || 0;
+            let clipListFromStore = apjsStoreState.clipListReducer.clipList;
+            if (currentClipIndex + 1 < clipListFromStore.length) {
+                apjsStore.dispatch(nextClip());
+                loadVideoSrc(sampleVideoPlayer);
+            }
+        }
     }
 
+    apjsStore.dispatch(updateClipList(ClipList, 0));
     loadVideoSrc(sampleVideoPlayer);
     timelineStore.subscribe(onTimeUpdate);
 });
 
 function loadVideoSrc(sampleVideoPlayer) {
-    // let currentClipIndex = apjsStore.getState().assetClipList.currentClipIndex || 0;
-    let currentClipIndex = 0;
-    let sourceElement = document.createElement("source");
-    sourceElement.type = "video/mp4";
-    sourceElement.src = ClipList[currentClipIndex].url;
-    sampleVideoPlayer.appendChild(sourceElement);
+    let apjsStoreState = apjsStore.getState();
+    if (apjsStoreState.clipListReducer) {
+        let currentClipIndex = apjsStoreState.clipListReducer.currentClipIndex || 0;
+        let clipListFromStore = apjsStoreState.clipListReducer.clipList;
+        let sourceElement = document.createElement("source");
+        sourceElement.type = "video/mp4";
+        sourceElement.src = clipListFromStore[currentClipIndex].url;
+        sampleVideoPlayer.innerHTML = "";
+        sampleVideoPlayer.appendChild(sourceElement);
+        if (currentClipIndex > 0) {
+            sampleVideoPlayer.load();
+            sampleVideoPlayer.play();
+        }
+    }
 }
 
 function initTimer() {
@@ -49,7 +64,7 @@ function initTimer() {
         let prevPlayerTime = timelineStore.getState().playerTime; 
         let currentPlayerTime = sampleVideoPlayer.currentTime;
         let currentPlayerState = apjsStore.getState().playerState;
-        if (prevPlayerTime === currentPlayerTime && currentPlayerState !== playerEnums.STALLED) {
+        if ((currentPlayerTime - prevPlayerTime) > STALLED_THRESHOLD && currentPlayerState !== playerEnums.STALLED) {
             console.error("Stall detected");
             apjsStore.dispatch(stalledState());
         }

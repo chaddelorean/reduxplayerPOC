@@ -3,7 +3,8 @@ const playerEnums = {
     STOPPED: "STOPPED",
     PAUSED: "PAUSED",
     SEEKING: "SEEKING",
-    STALLED: "STALLED"
+    STALLED: "STALLED",
+    ENDED: "ENDED"
 }
 
 const playerActions = {
@@ -16,7 +17,8 @@ const playerActions = {
     NEXT_CLIP: "NEXT_CLIP",
     PREV_CLIP: "PREV_CLIP",
     SWITCH_CLIP: "SWITCH_CLIP",
-    CLIPLIST_UPDATE: "CLIPLIST_UPDATE"
+    CLIPLIST_UPDATE: "CLIPLIST_UPDATE",
+    CLIP_ENDED: "CLIP_ENDED"
 }
 
 export {

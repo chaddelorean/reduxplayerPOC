@@ -29,6 +29,9 @@ const playerStateReducer = (playerState = playerEnums.STOPPED, action) => {
         case playerActions.SEEKING_STATE:
             playerState = playerEnums.SEEKING;
             break;
+        case playerActions.CLIP_ENDED:
+            playerState = playerEnums.ENDED;
+            break;
     }
     return playerState
 }

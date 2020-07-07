@@ -39,6 +39,10 @@ const switchClip = (clipIndex) => ({
     clipIndex
 });
 
+const clipEnded = () => ({
+    type: playerActions.CLIP_ENDED
+})
+
 const updateClipList = (clipList, currentClipIndex) => ({
     type: playerActions.CLIPLIST_UPDATE,
     assetClipList: {
@@ -57,5 +61,6 @@ export {
     nextClip,
     prevClip,
     switchClip,
-    updateClipList
+    updateClipList,
+    clipEnded
 }
