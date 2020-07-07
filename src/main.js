@@ -15,7 +15,7 @@ $(function() {
         initTimer();
     };
     sampleVideoPlayer.onpause = () => {
-    apjsStore.dispatch(pauseState());
+        apjsStore.dispatch(pauseState());
         clearInterval(timelineInterval);
     }
     sampleVideoPlayer.onstalled = () => {
