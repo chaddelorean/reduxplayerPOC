@@ -6,6 +6,20 @@ const timeUpdate = (msIncrement, playerTime) => ({
     playerTime
 });
 
+const setAbosluteTimeline = (newTime) => ({
+    type: playerActions.ABSOLUTE_TIME_UPDATE,
+    payLoad: newTime
+});
+
+const setBeacon = (beacon) => ({
+    type: playerActions.SET_BEACON,
+    payLoad: beacon
+});
+
+const clearBeacons = () => ({
+    type: playerActions.CLEAR_BEACONS
+});
+
 const playState = () => ({
     type: playerActions.PLAY_STATE
 });
@@ -53,6 +67,9 @@ const updateClipList = (clipList, currentClipIndex) => ({
 
 export {
     timeUpdate,
+    setAbosluteTimeline,
+    setBeacon,
+    clearBeacons,
     playState,
     pauseState,
     stalledState,

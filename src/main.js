@@ -1,6 +1,8 @@
-import { timeUpdate, playState, pauseState, stalledState, stoppedState, seekingState, nextClip, updateClipList, clipEnded } from './actions/index.js';
+import { timeUpdate, playState, pauseState, stalledState, stoppedState, seekingState, nextClip, updateClipList, clipEnded, setAbosluteTimeline, setBeacon, clearBeacons } from './actions/index.js';
+import { getWholePlayerTime, convertToMilliseconds} from './utils.js';
 import { timelineStore, apjsStore } from './store/index.js';
 import { playerEnums } from './types/playerEnums.js';
+import beacons from './types/beacons.js';
 import ClipList from './types/clipList.js';
 
 const intervalTime = 100;
@@ -11,6 +13,7 @@ let timelineInterval;
 $(function() {
     sampleVideoPlayer = document.getElementById("sampleVideoPlayer");
     sampleVideoPlayer.onplay = () => {
+        processBeacons();
         apjsStore.dispatch(playState());
         initTimer();
     };
@@ -24,6 +27,9 @@ $(function() {
     sampleVideoPlayer.onseeking = () => {
         apjsStore.dispatch(seekingState());
     }
+    sampleVideoPlayer.onseeked = (event) => {
+        timelineStore.dispatch(setAbosluteTimeline(getWholePlayerTime(convertToMilliseconds(sampleVideoPlayer.currentTime))));
+    };
     sampleVideoPlayer.onended = () => {
         apjsStore.dispatch(clipEnded());
         let apjsStoreState = apjsStore.getState();
@@ -31,6 +37,8 @@ $(function() {
             let currentClipIndex = apjsStoreState.clipListReducer.currentClipIndex || 0;
             let clipListFromStore = apjsStoreState.clipListReducer.clipList;
             if (currentClipIndex + 1 < clipListFromStore.length) {
+                timelineStore.dispatch(setAbosluteTimeline(0));
+                timelineStore.dispatch(clearBeacons());
                 apjsStore.dispatch(nextClip());
                 loadVideoSrc(sampleVideoPlayer);
             }
@@ -53,10 +61,43 @@ function loadVideoSrc(sampleVideoPlayer) {
         sampleVideoPlayer.innerHTML = "";
         sampleVideoPlayer.appendChild(sourceElement);
         if (currentClipIndex > 0) {
-            sampleVideoPlayer.load();
-            sampleVideoPlayer.play();
+            sampleVideoPlayer.load()
+            setTimeout(() => {
+                sampleVideoPlayer.play();
+            }, 1000);
         }
     }
+}
+
+function processBeacons() {
+    let assetDuration = sampleVideoPlayer.duration;
+    beacons.map(beaconType => {
+        let timeIndex = 0;
+        switch (beaconType) {
+            case "defaultImpression":
+                timeIndex = 0;
+                break;
+            case "firstQuartile":
+                timeIndex = assetDuration * .25;
+                break;
+            case "midway": 
+                timeIndex = assetDuration / 2;
+                break;
+            case "thirdQuartile":
+                timeIndex = assetDuration * .75;
+                break;
+            case "complete":
+                timeIndex = assetDuration;
+                break;
+        }
+
+        let beacon = {
+            type: beaconType,
+            timeIndex: convertToMilliseconds(timeIndex),
+            isFired: false
+        }
+        timelineStore.dispatch(setBeacon(beacon));
+    });
 }
 
 function initTimer() {
@@ -77,19 +118,19 @@ function onTimeUpdate() {
     let currentAPJSTimeSeconds = currentAPJSTimeMS / 1000;
     let currentPlayerTime = timelineStore.getState().playerTime;
 
-    if (currentAPJSTimeMS % 1000 === 0) {
+    if (currentAPJSTimeMS % 1000 === 0 && currentAPJSTimeMS !== 0) {
         console.log(`1 second interval happened! APJSTime: ${currentAPJSTimeMS} ms PlayerTime: ${currentPlayerTime} sec`);
     }
 
-    if (currentAPJSTimeSeconds % 30 === 0) {
+    if (currentAPJSTimeSeconds % 30 === 0 && currentAPJSTimeMS !== 0) {
         console.log(`30 second interval happened! APJSTime: ${currentAPJSTimeSeconds} sec PlayerTime: ${currentPlayerTime} sec`);
     }
 
-    if (currentAPJSTimeSeconds % 60 === 0) {
+    if (currentAPJSTimeSeconds % 60 === 0 && currentAPJSTimeMS !== 0) {
         console.log(`1 minute interval happened! APJSTime: ${currentAPJSTimeSeconds} sec PlayerTime: ${currentPlayerTime} sec`);
     }
 
-    if (currentAPJSTimeSeconds % 300 === 0) {
+    if (currentAPJSTimeSeconds % 300 === 0 && currentAPJSTimeMS !== 0) {
         console.log(`5 minute interval happened! APJSTime: ${currentAPJSTimeSeconds} sec PlayerTime: ${currentPlayerTime} sec`);
     }
 }
