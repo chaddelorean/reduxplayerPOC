@@ -1,7 +1,7 @@
 import { timeUpdate, playState, pauseState, stalledState, stoppedState, seekingState, nextClip, updateClipList, clipEnded, setAbosluteTimeline, setBeacon, clearBeacons } from './actions/index.js';
 import { getWholePlayerTime, convertToMilliseconds} from './utils.js';
 import { timelineStore, apjsStore } from './store/index.js';
-import { playerEnums } from './types/playerEnums.js';
+import { playerEnums, beaconTypes } from './types/playerEnums.js';
 import beacons from './types/beacons.js';
 import ClipList from './types/clipList.js';
 
@@ -74,19 +74,19 @@ function processBeacons() {
     beacons.map(beaconType => {
         let timeIndex = 0;
         switch (beaconType) {
-            case "defaultImpression":
+            case beaconTypes.DEFAULT_IMPRESSION:
                 timeIndex = 0;
                 break;
-            case "firstQuartile":
+            case beaconTypes.FIRST_QUARTILE:
                 timeIndex = assetDuration * .25;
                 break;
-            case "midway": 
+            case beaconTypes.MIDWAY: 
                 timeIndex = assetDuration / 2;
                 break;
-            case "thirdQuartile":
+            case beaconTypes.THIRD_QUARTILE:
                 timeIndex = assetDuration * .75;
                 break;
-            case "complete":
+            case beaconTypes.COMPLETE:
                 timeIndex = assetDuration;
                 break;
         }

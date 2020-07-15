@@ -24,7 +24,16 @@ const playerActions = {
     CLIP_ENDED: "CLIP_ENDED"
 }
 
+const beaconTypes = {
+    DEFAULT_IMPRESSION: "defaultImpression",
+    FIRST_QUARTILE: "firstQuartile",
+    MIDWAY: "midway",
+    THIRD_QUARTILE: "thirdQuartile",
+    COMPLETE: "complete"
+}
+
 export {
     playerEnums,
-    playerActions
+    playerActions,
+    beaconTypes
 }
