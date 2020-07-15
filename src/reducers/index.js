@@ -1,26 +1,29 @@
 import { combineReducers } from 'redux';
 import { playerEnums, playerActions } from '../types/playerEnums.js'
 
-const timelineReducer = (timeObject = {apjsTime: 0, playerTime: 0, beacons: []}, action) => {
+const timelineReducer = (timeObject = {apjsTime: 0, playerTime: 0, beacons: [], timeShiftable: true}, action) => {
     switch (action.type) {
         case playerActions.TIME_UPDATE:
             timeObject.apjsTime += action.msIncrement;
             timeObject.playerTime = action.playerTime;
             break;
         case playerActions.ABSOLUTE_TIME_UPDATE:
-            timeObject.apjsTime = action.payLoad;
-            timeObject.playerTime = action.payLoad;
+            timeObject.apjsTime = action.payload;
+            timeObject.playerTime = action.payload;
             break;
         case playerActions.SET_BEACON:
-            let index = timeObject.beacons.findIndex(beacon => beacon.type === action.payLoad.type && beacon.timeIndex === action.payLoad.timeIndex);
+            let index = timeObject.beacons.findIndex(beacon => beacon.type === action.payload.type && beacon.timeIndex === action.payload.timeIndex);
             if (index !== -1) {
-                timeObject.beacons.splice(index, action.payLoad);
+                timeObject.beacons.splice(index, action.payload);
             } else {
-                timeObject.beacons.push(action.payLoad);
+                timeObject.beacons.push(action.payload);
             }
             break;
         case playerActions.CLEAR_BEACONS:
             timeObject.beacons = [];
+            break;
+        case playerActions.SET_TIME_SHIFTABLE:
+            timeObject.timeShiftable = action.payload;
             break;
     }
 

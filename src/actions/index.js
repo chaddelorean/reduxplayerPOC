@@ -8,17 +8,22 @@ const timeUpdate = (msIncrement, playerTime) => ({
 
 const setAbosluteTimeline = (newTime) => ({
     type: playerActions.ABSOLUTE_TIME_UPDATE,
-    payLoad: newTime
+    payload: newTime
 });
 
 const setBeacon = (beacon) => ({
     type: playerActions.SET_BEACON,
-    payLoad: beacon
+    payload: beacon
 });
 
 const clearBeacons = () => ({
     type: playerActions.CLEAR_BEACONS
 });
+
+const setTimeShiftable = (timeShiftable) => ({
+    type: playerActions.SET_TIME_SHIFTABLE,
+    payload: timeShiftable
+})
 
 const playState = () => ({
     type: playerActions.PLAY_STATE
@@ -70,6 +75,7 @@ export {
     setAbosluteTimeline,
     setBeacon,
     clearBeacons,
+    setTimeShiftable,
     playState,
     pauseState,
     stalledState,

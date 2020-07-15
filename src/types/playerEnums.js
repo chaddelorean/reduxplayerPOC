@@ -21,7 +21,8 @@ const playerActions = {
     PREV_CLIP: "PREV_CLIP",
     SWITCH_CLIP: "SWITCH_CLIP",
     CLIPLIST_UPDATE: "CLIPLIST_UPDATE",
-    CLIP_ENDED: "CLIP_ENDED"
+    CLIP_ENDED: "CLIP_ENDED",
+    SET_TIME_SHIFTABLE: "SET_TIME_SHIFTABLE"
 }
 
 const beaconTypes = {
