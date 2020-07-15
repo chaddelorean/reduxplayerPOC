@@ -1,5 +1,5 @@
 import { timeUpdate, playState, pauseState, stalledState, stoppedState, seekingState, nextClip, updateClipList, clipEnded, setAbosluteTimeline, setBeacon, clearBeacons } from './actions/index.js';
-import { getWholePlayerTime, convertToMilliseconds} from './utils.js';
+import { getWholePlayerTime, convertToMilliseconds, convertToSeconds} from './utils.js';
 import { timelineStore, apjsStore } from './store/index.js';
 import { playerEnums, beaconTypes } from './types/playerEnums.js';
 import beacons from './types/beacons.js';
@@ -44,6 +44,13 @@ $(function() {
             }
         }
     }
+    sampleVideoPlayer.onloadeddata = () => {
+        let apjsStoreState = apjsStore.getState();
+        let currentClipIndex = apjsStoreState.clipListReducer.currentClipIndex || 0;
+        if (currentClipIndex > 0) {
+            sampleVideoPlayer.play();
+        }
+    }
 
     apjsStore.dispatch(updateClipList(ClipList, 0));
     loadVideoSrc(sampleVideoPlayer);
@@ -53,8 +60,8 @@ $(function() {
 function loadVideoSrc(sampleVideoPlayer) {
     let apjsStoreState = apjsStore.getState();
     if (apjsStoreState.clipListReducer) {
-        let currentClipIndex = apjsStoreState.clipListReducer.currentClipIndex || 0;
         let clipListFromStore = apjsStoreState.clipListReducer.clipList;
+        let currentClipIndex = apjsStoreState.clipListReducer.currentClipIndex || 0;
         let sourceElement = document.createElement("source");
         sourceElement.type = "video/mp4";
         sourceElement.src = clipListFromStore[currentClipIndex].url;
@@ -62,9 +69,6 @@ function loadVideoSrc(sampleVideoPlayer) {
         sampleVideoPlayer.appendChild(sourceElement);
         if (currentClipIndex > 0) {
             sampleVideoPlayer.load()
-            setTimeout(() => {
-                sampleVideoPlayer.play();
-            }, 1000);
         }
     }
 }
@@ -115,7 +119,7 @@ function initTimer() {
 
 function onTimeUpdate() {
     let currentAPJSTimeMS = timelineStore.getState().apjsTime;
-    let currentAPJSTimeSeconds = currentAPJSTimeMS / 1000;
+    let currentAPJSTimeSeconds = convertToSeconds(currentAPJSTimeMS);
     let currentPlayerTime = timelineStore.getState().playerTime;
 
     if (currentAPJSTimeMS % 1000 === 0 && currentAPJSTimeMS !== 0) {
